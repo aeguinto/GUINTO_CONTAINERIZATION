@@ -1,0 +1,49 @@
+---
+- name: Install Prerequisites
+  apt:
+    name:
+      - python3
+      - python3-pip
+    state: present
+
+- name: Install Docker File
+  apt: 
+    name: docker.io
+    state: latest
+    update_cache: yes
+  register: docker
+
+- name: Install docker.py
+  pip:
+    name: docker.py
+    state: latest
+
+- name: Installation of docker-py package
+  pip: name=docker-py
+
+- name: Creating Build Directory
+  file:
+    path: "/home/aguinto/GUINTO_CONTAINERIZATION/docker"
+    state: directory
+
+- name: Copying Dockerfile
+  copy:
+    src: "/home/aguinto/GUINTO_CONTAINERIZATION/Dockerfile"
+    dest: "/home/aguinto/GUINTO_CONTAINERIZATION/docker/Dockerfile"
+
+- name: Building Container Image
+  docker_image:
+    name: hoa5-1
+    tag: v1
+    path: "/home/aguinto/GUINTO_CONTAINERIZATION/docker"
+    state: build
+
+- name: Running the Container
+  docker_container:
+    image: hoa5-1:v1
+    name: hoa5-1
+    state: started
+    ports:
+      - "8080:80"
+
+# tasks file for docker
